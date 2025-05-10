@@ -7,7 +7,7 @@ export default function CreateRoom() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);  // Loading state
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleCreateRoom = async (e) => {
@@ -24,8 +24,8 @@ export default function CreateRoom() {
       return;
     }
 
-    setError(null);  // Reset any previous errors
-    setLoading(true); // Set loading state to true
+    setError(null);
+    setLoading(true);
 
     try {
       const roomData = {
@@ -35,16 +35,13 @@ export default function CreateRoom() {
         createdAt: serverTimestamp(),
       };
 
-      // Adding room data to Firestore
       const docRef = await addDoc(collection(db, "rooms"), roomData);
-
-      // Navigate to the new study room with the created room ID
       navigate(`/studyroom/${docRef.id}`);
     } catch (err) {
-      console.error("Error creating room:", err);  // Log full error object to the console
-      setError(err.message || "Something went wrong. Please try again.");
+      console.error("Error creating room:", err);
+      setError("Failed to create room. Please try again.");
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -69,8 +66,10 @@ export default function CreateRoom() {
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-          disabled={loading}  // Disable button when loading
+          className={`w-full px-4 py-2 rounded text-white ${
+            loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
+          }`}
+          disabled={loading}
         >
           {loading ? "Creating..." : "Create Room"}
         </button>

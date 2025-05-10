@@ -18,21 +18,21 @@ export default function Navbar({ user }) {
         {user ? (
           <div className="flex items-center space-x-4">
             <span>Welcome, {user.displayName}</span>
+            <Link to="/" className="text-white px-4 py-2 rounded">
+              Home
+            </Link>
+            <Link to="/create-room" className="bg-blue-500 text-white px-4 py-2 rounded">
+              Create Room
+            </Link>
+            <Link to="/join-room" className="bg-green-500 text-white px-4 py-2 rounded">
+              Join Room
+            </Link>
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white px-4 py-2 rounded"
             >
               Logout
             </button>
-            <Link to="/" className="text-white px-4 py-2 rounded">
-              Home
-            </Link>
-            <Link
-              to="/create-room"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Create Room
-            </Link>
           </div>
         ) : (
           <Link to="/login" className="text-white px-4 py-2 rounded">
