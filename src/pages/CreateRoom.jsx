@@ -46,34 +46,109 @@ export default function CreateRoom() {
   };
 
   return (
-    <div className="min-h-screen p-8 bg-gray-50">
-      <h1 className="text-3xl font-bold mb-6">Create a New Study Room</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <form onSubmit={handleCreateRoom} className="space-y-4 max-w-md">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Room Name"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Room Description (optional)"
-          className="w-full p-2 border rounded"
-        />
-        <button
-          type="submit"
-          className={`w-full px-4 py-2 rounded text-white ${
-            loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          disabled={loading}
-        >
-          {loading ? "Creating..." : "Create Room"}
-        </button>
-      </form>
+    <div className="min-h-screen pt-24 px-4 pb-12">
+      <div className="container mx-auto max-w-2xl animate-fadeIn">
+        <div className="text-center mb-8">
+          <svg className="w-16 h-16 text-black mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          <h1 className="text-4xl font-bold mb-3 text-black">
+            Create Study Room
+          </h1>
+          <p className="text-gray-600">Set up a new collaborative study space</p>
+        </div>
+
+        <div className="glass rounded-2xl p-8 border border-gray-200">
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 flex items-center space-x-2">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleCreateRoom} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Room Name *
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., Computer Science Study Group"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black focus:ring-2 focus:ring-black/20 transition-all"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description (Optional)
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="What will you be studying in this room?"
+                rows="4"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black focus:ring-2 focus:ring-black/20 transition-all resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 px-6 bg-black hover:bg-gray-800 disabled:bg-gray-300 text-white disabled:text-gray-500 font-semibold rounded-xl transition-all transform hover:scale-[1.02] disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-black/20 flex items-center justify-center space-x-2"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>Creating Room...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span>Create Room</span>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Tips Section */}
+        <div className="mt-8 glass rounded-2xl p-6 border border-gray-200">
+          <h3 className="text-lg font-bold mb-4 text-black flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+            Tips for Creating a Great Study Room
+          </h3>
+          <ul className="space-y-2 text-gray-600">
+            <li className="flex items-start">
+              <span className="text-black font-bold mr-2">•</span>
+              <span>Use a clear, descriptive name so others can easily find your room</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-black font-bold mr-2">•</span>
+              <span>Include the subject or topic in your room description</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-black font-bold mr-2">•</span>
+              <span>Share the room code with your study group members</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-black font-bold mr-2">•</span>
+              <span>Set ground rules for focus time and break periods</span>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
