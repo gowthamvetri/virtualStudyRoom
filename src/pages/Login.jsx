@@ -24,21 +24,26 @@ export default function Login() {
   return (
     <div className="flex justify-center items-center min-h-screen pt-20 px-4">
       <div className="w-full max-w-md animate-fadeIn">
-        <div className="glass rounded-2xl p-8 border border-gray-200 shadow-2xl">
+        <div className="glass rounded-2xl p-8 border card-shadow" style={{ borderColor: 'var(--border)' }}>
           <div className="text-center mb-8">
-            <svg className="w-20 h-20 text-black mb-4 transform hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            <h2 className="text-3xl font-bold mb-2 text-black">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--accent)' }}>
+                <svg className="w-16 h-16 transform hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--primary)' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
               Welcome Back
             </h2>
-            <p className="text-gray-600">Sign in to access your study space</p>
+            <p style={{ color: 'var(--text-secondary)' }}>Sign in to access your study space</p>
           </div>
           
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full py-4 px-6 bg-black hover:bg-gray-800 text-white font-semibold rounded-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 shadow-lg"
+            className="w-full py-4 px-6 text-white font-semibold rounded-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
+            style={{ backgroundColor: 'var(--primary)', boxShadow: '0 4px 6px -1px rgba(101, 195, 229, 0.3)' }}
           >
             {loading ? (
               <>
@@ -67,34 +72,34 @@ export default function Login() {
         </div>
 
         {/* Features Preview */}
-        <div className="mt-8 glass rounded-2xl p-6 border border-gray-200">
-          <h3 className="text-lg font-bold mb-4 text-black text-center">What You'll Get</h3>
+        <div className="mt-8 glass rounded-2xl p-6 border" style={{ borderColor: 'var(--border)' }}>
+          <h3 className="text-lg font-bold mb-4 text-center" style={{ color: 'var(--text-primary)' }}>What You'll Get</h3>
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
-              <svg className="flex-shrink-0 w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="flex-shrink-0 w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--primary)' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               <div>
-                <p className="font-medium text-black">Pomodoro Timer</p>
-                <p className="text-xs text-gray-600">Stay focused with proven time management</p>
+                <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Pomodoro Timer</p>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Stay focused with proven time management</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <svg className="flex-shrink-0 w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="flex-shrink-0 w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--secondary)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
               <div>
-                <p className="font-medium text-black">Real-Time Messaging</p>
-                <p className="text-xs text-gray-600">Chat instantly with study partners</p>
+                <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Real-Time Messaging</p>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Chat instantly with study partners</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <svg className="flex-shrink-0 w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="flex-shrink-0 w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
               <div>
-                <p className="font-medium text-black">Collaborative Rooms</p>
-                <p className="text-xs text-gray-600">Create and join unlimited study spaces</p>
+                <p className="font-medium" style={{ color: 'var(--text-primary)' }}>Collaborative Rooms</p>
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Create and join unlimited study spaces</p>
               </div>
             </div>
           </div>

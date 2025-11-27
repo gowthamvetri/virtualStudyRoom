@@ -13,15 +13,45 @@ export default function StudyRoom() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [copied, setCopied] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState("");
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const calculateTimeRemaining = (expiresAt) => {
+    const expirationDate = expiresAt.toDate ? expiresAt.toDate() : new Date(expiresAt);
+    const now = new Date();
+    const diff = expirationDate - now;
+
+    if (diff <= 0) {
+      return "Expired";
+    }
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Warn user before leaving the page
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   useEffect(() => {
     const fetchRoom = async () => {
@@ -29,7 +59,22 @@ export default function StudyRoom() {
         const roomRef = doc(db, "rooms", roomId);
         const roomSnap = await getDoc(roomRef);
         if (roomSnap.exists()) {
-          setRoom(roomSnap.data());
+          const roomData = roomSnap.data();
+          
+          // Check if room has expired
+          if (roomData.expiresAt) {
+            const expirationDate = roomData.expiresAt.toDate ? roomData.expiresAt.toDate() : new Date(roomData.expiresAt);
+            const now = new Date();
+            
+            if (now > expirationDate) {
+              // Room has expired
+              setRoom(null);
+              setLoading(false);
+              return;
+            }
+          }
+          
+          setRoom(roomData);
         } else {
           setRoom(null);
         }
@@ -56,6 +101,26 @@ export default function StudyRoom() {
 
     return () => unsubscribe();
   }, [roomId]);
+
+  // Update countdown timer every second
+  useEffect(() => {
+    if (!room || !room.expiresAt) return;
+
+    const updateTimer = () => {
+      const remaining = calculateTimeRemaining(room.expiresAt);
+      setTimeRemaining(remaining);
+      
+      // If expired, redirect to home
+      if (remaining === "Expired") {
+        navigate("/");
+      }
+    };
+
+    updateTimer(); // Initial update
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [room, navigate]);
 
   const sendMessage = async (e) => {
     e?.preventDefault();
@@ -112,6 +177,18 @@ export default function StudyRoom() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleLeaveRoom = () => {
+    setShowLeaveDialog(true);
+  };
+
+  const confirmLeave = () => {
+    navigate('/');
+  };
+
+  const cancelLeave = () => {
+    setShowLeaveDialog(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -132,11 +209,12 @@ export default function StudyRoom() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-black mb-2">Room Not Found</h2>
-          <p className="text-gray-600 mb-6">This study room doesn't exist or has been deleted.</p>
+          <h2 className="text-2xl font-bold text-black mb-2">Room Not Available</h2>
+          <p className="text-gray-600 mb-6">This study room doesn't exist, has expired, or has been deleted. Rooms automatically expire 4 hours after creation.</p>
           <button
-            onClick={() => navigate("/")}
-            className="px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-all"
+            onClick={() => navigate('/')}
+            className="px-6 py-3 text-white font-medium rounded-lg transition-all"
+            style={{ backgroundColor: 'var(--primary)' }}
           >
             Go to Home
           </button>
@@ -149,23 +227,38 @@ export default function StudyRoom() {
     <div className="min-h-screen pt-20 px-4 pb-8">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="glass rounded-2xl p-6 border border-gray-200 mb-6 animate-fadeIn">
+        <div className="glass rounded-2xl p-6 border mb-6 animate-fadeIn card-shadow" style={{ borderColor: 'var(--border)' }}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-black mb-2">{room.name}</h1>
+              <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{room.name}</h1>
               <p className="text-gray-600">Created by {room.creator}</p>
               {room.description && (
                 <p className="text-gray-500 text-sm mt-1">{room.description}</p>
               )}
+              {room.expiresAt && timeRemaining && (
+                <div className="mt-2 inline-flex items-center px-3 py-1.5 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <svg className="w-4 h-4 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm font-semibold text-yellow-700">
+                    {timeRemaining === "Expired" ? "Room Expired" : `Room expires in: ${timeRemaining}`}
+                  </span>
+                </div>
+              )}
             </div>
             <div className="flex items-center space-x-3">
-              <div className="glass px-4 py-2 rounded-lg border border-gray-300">
-                <p className="text-xs text-gray-500 mb-1">Room Code</p>
-                <p className="font-mono text-sm text-black">{roomId.substring(0, 8)}...</p>
+              <div className="glass px-4 py-2 rounded-lg border" style={{ borderColor: 'var(--border)' }}>
+                <p className="text-xs mb-1" style={{ color: 'var(--text-tertiary)' }}>Room Code</p>
+                <p className="font-mono text-sm" style={{ color: 'var(--text-primary)' }}>{roomId.substring(0, 8)}...</p>
               </div>
               <button
                 onClick={copyRoomCode}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-black rounded-lg border border-gray-300 transition-all flex items-center space-x-2"
+                className="px-4 py-2 rounded-lg border transition-all flex items-center space-x-2"
+                style={{ 
+                  backgroundColor: 'var(--bg-secondary)',
+                  color: 'var(--primary)',
+                  borderColor: 'var(--border)'
+                }}
                 title="Copy room code"
               >
                 {copied ? (
@@ -184,30 +277,43 @@ export default function StudyRoom() {
                   </>
                 )}
               </button>
+              <button
+                onClick={handleLeaveRoom}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all flex items-center space-x-2"
+                title="Leave room"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>Leave</span>
+              </button>
             </div>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Pomodoro Timer */}
-          <div className="glass rounded-2xl p-8 border border-gray-200 animate-fadeIn">
+          <div className="glass rounded-2xl p-8 border animate-fadeIn card-shadow" style={{ borderColor: 'var(--border)' }}>
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--primary)' }}>
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-black">Pomodoro Timer</h2>
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Pomodoro Timer</h2>
             </div>
 
             <div className="text-center mb-8">
-              <div className={`text-7xl font-bold mb-2 font-mono ${timeLeft === 0 ? 'text-red-600' : 'text-black'}`}>
+              <div className={`text-7xl font-bold mb-2 font-mono`} style={{ color: timeLeft === 0 ? '#ef4444' : 'var(--text-primary)' }}>
                 {formatTime(timeLeft)}
               </div>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <div
-                  className="h-full bg-black transition-all duration-1000"
-                  style={{ width: `${(timeLeft / (25 * 60)) * 100}%` }}
+                  className="h-full transition-all duration-1000"
+                  style={{ 
+                    width: `${(timeLeft / (25 * 60)) * 100}%`,
+                    backgroundColor: 'var(--primary)'
+                  }}
                 />
               </div>
             </div>
@@ -216,7 +322,8 @@ export default function StudyRoom() {
               {!isActive ? (
                 <button
                   onClick={startTimer}
-                  className="px-8 py-3 bg-black hover:bg-gray-800 text-white font-semibold rounded-xl transition-all transform hover:scale-105 flex items-center space-x-2 shadow-lg"
+                  className="px-8 py-3 text-white font-semibold rounded-xl transition-all transform hover:scale-105 flex items-center space-x-2 card-shadow-hover"
+                  style={{ backgroundColor: 'var(--primary)' }}
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
@@ -226,7 +333,8 @@ export default function StudyRoom() {
               ) : (
                 <button
                   onClick={stopTimer}
-                  className="px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all transform hover:scale-105 flex items-center space-x-2 shadow-lg"
+                  className="px-8 py-3 text-white font-semibold rounded-xl transition-all transform hover:scale-105 flex items-center space-x-2 card-shadow-hover"
+                  style={{ backgroundColor: 'var(--warning)' }}
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -236,7 +344,12 @@ export default function StudyRoom() {
               )}
               <button
                 onClick={resetTimer}
-                className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-black font-semibold rounded-xl border border-gray-300 transition-all transform hover:scale-105 flex items-center space-x-2"
+                className="px-6 py-3 font-semibold rounded-xl border transition-all transform hover:scale-105 flex items-center space-x-2"
+                style={{ 
+                  backgroundColor: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  borderColor: 'var(--border)'
+                }}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -247,27 +360,27 @@ export default function StudyRoom() {
           </div>
 
           {/* Chat Section */}
-          <div className="glass rounded-2xl p-8 border border-gray-200 flex flex-col animate-fadeIn" style={{ height: '500px' }}>
+          <div className="glass rounded-2xl p-8 border flex flex-col animate-fadeIn card-shadow" style={{ height: '500px', borderColor: 'var(--border)' }}>
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--secondary)' }}>
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-black">Live Chat</h2>
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Live Chat</h2>
             </div>
 
             <div className="flex-1 overflow-y-auto mb-4 space-y-3 pr-2" style={{ maxHeight: 'calc(100% - 140px)' }}>
               {messages.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </div>
-                    <p className="text-gray-600">No messages yet</p>
-                    <p className="text-gray-500 text-sm">Start the conversation!</p>
+                    <p style={{ color: 'var(--text-secondary)' }}>No messages yet</p>
+                    <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Start the conversation!</p>
                   </div>
                 </div>
               ) : (
@@ -275,8 +388,11 @@ export default function StudyRoom() {
                   const isCurrentUser = msg.sender === auth.currentUser?.displayName;
                   return (
                     <div key={msg.id} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-xs lg:max-w-md ${isCurrentUser ? 'bg-black text-white' : 'bg-gray-200 text-black'} rounded-2xl px-4 py-2`}>
-                        <p className={`text-xs font-semibold mb-1 ${isCurrentUser ? 'text-gray-300' : 'text-gray-600'}`}>{msg.sender}</p>
+                      <div className={`max-w-xs lg:max-w-md rounded-2xl px-4 py-2`} style={{ 
+                        backgroundColor: isCurrentUser ? 'var(--primary)' : 'var(--bg-secondary)',
+                        color: isCurrentUser ? 'white' : 'var(--text-primary)'
+                      }}>
+                        <p className={`text-xs font-semibold mb-1`} style={{ color: isCurrentUser ? 'rgba(255, 255, 255, 0.8)' : 'var(--text-tertiary)' }}>{msg.sender}</p>
                         <p className="break-words">{msg.text}</p>
                       </div>
                     </div>
@@ -292,12 +408,22 @@ export default function StudyRoom() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black focus:ring-2 focus:ring-black/20 transition-all"
+                className="flex-1 px-4 py-3 bg-white rounded-xl transition-all"
+                style={{ 
+                  border: '2px solid var(--border)',
+                  color: 'var(--text-primary)'
+                }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
               />
               <button
                 type="submit"
                 disabled={!message.trim()}
-                className="px-6 py-3 bg-gray-700 hover:bg-black disabled:bg-gray-300 text-white disabled:text-gray-500 font-semibold rounded-xl transition-all disabled:cursor-not-allowed flex items-center space-x-2"
+                className="px-6 py-3 font-semibold rounded-xl transition-all disabled:cursor-not-allowed flex items-center space-x-2"
+                style={{ 
+                  backgroundColor: !message.trim() ? 'var(--bg-secondary)' : 'var(--primary)',
+                  color: !message.trim() ? 'var(--text-tertiary)' : 'white'
+                }}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -308,6 +434,43 @@ export default function StudyRoom() {
           </div>
         </div>
       </div>
+
+      {/* Leave Confirmation Dialog */}
+      {showLeaveDialog && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="glass rounded-2xl p-8 border max-w-md w-full animate-fadeIn card-shadow" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#eab308' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Leave Study Room?</h3>
+              <p style={{ color: 'var(--text-secondary)' }}>
+                Are you sure you want to leave this study room? You can rejoin anytime using the room code.
+              </p>
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={cancelLeave}
+                className="flex-1 px-6 py-3 font-semibold rounded-xl transition-all"
+                style={{ 
+                  backgroundColor: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                Stay in Room
+              </button>
+              <button
+                onClick={confirmLeave}
+                className="flex-1 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all"
+              >
+                Leave Room
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

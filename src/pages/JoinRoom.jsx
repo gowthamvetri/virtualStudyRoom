@@ -45,17 +45,19 @@ export default function JoinRoom({ user }) {
       <div className="container mx-auto max-w-2xl animate-fadeIn">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <svg className="w-16 h-16 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1721 9z" />
-            </svg>
+            <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--accent)' }}>
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--primary)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1721 9z" />
+              </svg>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold mb-3 text-black">
+          <h1 className="text-4xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
             Join Study Room
           </h1>
-          <p className="text-gray-600">Enter the room code to connect with your peers</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Enter the room code to connect with your peers</p>
         </div>
 
-        <div className="glass rounded-2xl p-8 border border-gray-200">
+        <div className="glass rounded-2xl p-8 border card-shadow" style={{ borderColor: 'var(--border)' }}>
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 flex items-center space-x-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -67,7 +69,7 @@ export default function JoinRoom({ user }) {
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                 Room Code
               </label>
               <input
@@ -76,15 +78,25 @@ export default function JoinRoom({ user }) {
                 onChange={(e) => setRoomCode(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleJoin()}
                 placeholder="Paste room code here"
-                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black focus:ring-2 focus:ring-black/20 transition-all font-mono text-lg"
+                className="w-full px-4 py-3 bg-white rounded-xl transition-all font-mono text-lg"
+                style={{ 
+                  border: '2px solid var(--border)',
+                  color: 'var(--text-primary)'
+                }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
               />
-              <p className="text-xs text-gray-600 mt-2">The room code is provided by the room creator</p>
+              <p className="text-xs mt-2" style={{ color: 'var(--text-tertiary)' }}>The room code is provided by the room creator</p>
             </div>
 
             <button
               onClick={handleJoin}
               disabled={loading || !roomCode.trim()}
-              className="w-full py-4 px-6 bg-black hover:bg-gray-800 disabled:bg-gray-300 text-white disabled:text-gray-500 font-semibold rounded-xl transition-all transform hover:scale-[1.02] disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-black/20 flex items-center justify-center space-x-2"
+              className="w-full py-4 px-6 font-semibold rounded-xl transition-all transform hover:scale-[1.02] disabled:scale-100 disabled:cursor-not-allowed flex items-center justify-center space-x-2 card-shadow-hover"
+              style={{ 
+                backgroundColor: (loading || !roomCode.trim()) ? 'var(--bg-secondary)' : 'var(--primary)',
+                color: (loading || !roomCode.trim()) ? 'var(--text-tertiary)' : 'white'
+              }}
             >
               {loading ? (
                 <>
@@ -107,32 +119,32 @@ export default function JoinRoom({ user }) {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-gray-600 text-sm">
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             Don't have a room code?{" "}
-            <a href="/create-room" className="text-black hover:text-gray-700 font-medium underline">
+            <a href="/create-room" className="font-medium underline" style={{ color: 'var(--primary)' }}>
               Create your own room
             </a>
           </p>
         </div>
 
         {/* Instructions */}
-        <div className="mt-8 glass rounded-2xl p-6 border border-gray-200">
-          <h3 className="text-lg font-bold mb-4 text-black">How to Get a Room Code</h3>
-          <div className="space-y-3 text-gray-600">
+        <div className="mt-8 glass rounded-2xl p-6 border" style={{ borderColor: 'var(--border)' }}>
+          <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>How to Get a Room Code</h3>
+          <div className="space-y-3" style={{ color: 'var(--text-secondary)' }}>
             <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-sm font-bold">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: 'var(--primary)' }}>
                 1
               </div>
               <p>Ask the room creator to share their room code with you</p>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-sm font-bold">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: 'var(--primary)' }}>
                 2
               </div>
               <p>The room code can be found at the top of any active study room</p>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-sm font-bold">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: 'var(--primary)' }}>
                 3
               </div>
               <p>Copy and paste the code into the field above to join instantly</p>
@@ -142,20 +154,20 @@ export default function JoinRoom({ user }) {
 
         {/* Benefits */}
         <div className="mt-6 grid md:grid-cols-3 gap-4">
-          <div className="glass rounded-xl p-4 border border-gray-200 text-center">
+          <div className="glass rounded-xl p-4 border text-center card-shadow" style={{ borderColor: 'var(--border)' }}>
             <div className="text-2xl mb-2">⚡</div>
-            <p className="text-sm font-medium text-black">Instant Access</p>
-            <p className="text-xs text-gray-600 mt-1">Join rooms in seconds</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Instant Access</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Join rooms in seconds</p>
           </div>
-          <div className="glass rounded-xl p-4 border border-gray-200 text-center">
+          <div className="glass rounded-xl p-4 border text-center card-shadow" style={{ borderColor: 'var(--border)' }}>
             <div className="text-2xl mb-2">💬</div>
-            <p className="text-sm font-medium text-black">Live Chat</p>
-            <p className="text-xs text-gray-600 mt-1">Communicate in real-time</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Live Chat</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Communicate in real-time</p>
           </div>
-          <div className="glass rounded-xl p-4 border border-gray-200 text-center">
+          <div className="glass rounded-xl p-4 border text-center card-shadow" style={{ borderColor: 'var(--border)' }}>
             <div className="text-2xl mb-2">⏱️</div>
-            <p className="text-sm font-medium text-black">Shared Timer</p>
-            <p className="text-xs text-gray-600 mt-1">Stay synced with peers</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Shared Timer</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Stay synced with peers</p>
           </div>
         </div>
       </div>

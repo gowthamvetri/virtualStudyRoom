@@ -28,11 +28,15 @@ export default function CreateRoom() {
     setLoading(true);
 
     try {
+      const expirationDate = new Date();
+      expirationDate.setHours(expirationDate.getHours() + 4); // 4 hours from now
+      
       const roomData = {
         name: name.trim(),
         description: description.trim(),
         creator: currentUser.displayName || "Anonymous",
         createdAt: serverTimestamp(),
+        expiresAt: expirationDate,
       };
 
       const docRef = await addDoc(collection(db, "rooms"), roomData);
@@ -49,16 +53,20 @@ export default function CreateRoom() {
     <div className="min-h-screen pt-24 px-4 pb-12">
       <div className="container mx-auto max-w-2xl animate-fadeIn">
         <div className="text-center mb-8">
-          <svg className="w-16 h-16 text-black mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-          <h1 className="text-4xl font-bold mb-3 text-black">
+          <div className="flex justify-center mb-4">
+            <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--accent)' }}>
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--primary)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
             Create Study Room
           </h1>
-          <p className="text-gray-600">Set up a new collaborative study space</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Set up a new collaborative study space</p>
         </div>
 
-        <div className="glass rounded-2xl p-8 border border-gray-200">
+        <div className="glass rounded-2xl p-8 border card-shadow" style={{ borderColor: 'var(--border)' }}>
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 flex items-center space-x-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -70,7 +78,7 @@ export default function CreateRoom() {
 
           <form onSubmit={handleCreateRoom} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                 Room Name *
               </label>
               <input
@@ -78,13 +86,19 @@ export default function CreateRoom() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Computer Science Study Group"
-                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black focus:ring-2 focus:ring-black/20 transition-all"
+                className="w-full px-4 py-3 bg-white rounded-xl transition-all"
+                style={{ 
+                  border: '2px solid var(--border)',
+                  color: 'var(--text-primary)'
+                }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                 Description (Optional)
               </label>
               <textarea
@@ -92,14 +106,24 @@ export default function CreateRoom() {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What will you be studying in this room?"
                 rows="4"
-                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black focus:ring-2 focus:ring-black/20 transition-all resize-none"
+                className="w-full px-4 py-3 bg-white rounded-xl transition-all resize-none"
+                style={{ 
+                  border: '2px solid var(--border)',
+                  color: 'var(--text-primary)'
+                }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 bg-black hover:bg-gray-800 disabled:bg-gray-300 text-white disabled:text-gray-500 font-semibold rounded-xl transition-all transform hover:scale-[1.02] disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-black/20 flex items-center justify-center space-x-2"
+              className="w-full py-4 px-6 text-white font-semibold rounded-xl transition-all transform hover:scale-[1.02] disabled:scale-100 disabled:cursor-not-allowed flex items-center justify-center space-x-2 card-shadow-hover"
+              style={{ 
+                backgroundColor: loading ? 'var(--bg-secondary)' : 'var(--primary)',
+                color: loading ? 'var(--text-tertiary)' : 'white'
+              }}
             >
               {loading ? (
                 <>
@@ -122,28 +146,28 @@ export default function CreateRoom() {
         </div>
 
         {/* Tips Section */}
-        <div className="mt-8 glass rounded-2xl p-6 border border-gray-200">
-          <h3 className="text-lg font-bold mb-4 text-black flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <div className="mt-8 glass rounded-2xl p-6 border" style={{ borderColor: 'var(--border)' }}>
+          <h3 className="text-lg font-bold mb-4 flex items-center" style={{ color: 'var(--text-primary)' }}>
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--primary)' }}>
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
             Tips for Creating a Great Study Room
           </h3>
-          <ul className="space-y-2 text-gray-600">
+          <ul className="space-y-2" style={{ color: 'var(--text-secondary)' }}>
             <li className="flex items-start">
-              <span className="text-black font-bold mr-2">•</span>
+              <span className="font-bold mr-2" style={{ color: 'var(--primary)' }}>•</span>
               <span>Use a clear, descriptive name so others can easily find your room</span>
             </li>
             <li className="flex items-start">
-              <span className="text-black font-bold mr-2">•</span>
+              <span className="font-bold mr-2" style={{ color: 'var(--primary)' }}>•</span>
               <span>Include the subject or topic in your room description</span>
             </li>
             <li className="flex items-start">
-              <span className="text-black font-bold mr-2">•</span>
+              <span className="font-bold mr-2" style={{ color: 'var(--primary)' }}>•</span>
               <span>Share the room code with your study group members</span>
             </li>
             <li className="flex items-start">
-              <span className="text-black font-bold mr-2">•</span>
+              <span className="font-bold mr-2" style={{ color: 'var(--primary)' }}>•</span>
               <span>Set ground rules for focus time and break periods</span>
             </li>
           </ul>
