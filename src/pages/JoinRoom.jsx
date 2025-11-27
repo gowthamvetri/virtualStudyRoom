@@ -45,11 +45,9 @@ export default function JoinRoom({ user }) {
       <div className="container mx-auto max-w-2xl animate-fadeIn">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--accent)' }}>
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--primary)' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1721 9z" />
-              </svg>
-            </div>
+            <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--primary)' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
           </div>
           <h1 className="text-4xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
             Join Study Room
@@ -132,20 +130,20 @@ export default function JoinRoom({ user }) {
           <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-primary)' }}>How to Get a Room Code</h3>
           <div className="space-y-3" style={{ color: 'var(--text-secondary)' }}>
             <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: 'var(--primary)' }}>
-                1
+              <div className="flex-shrink-0 text-2xl font-bold" style={{ color: 'var(--primary)' }}>
+                1.
               </div>
               <p>Ask the room creator to share their room code with you</p>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: 'var(--primary)' }}>
-                2
+              <div className="flex-shrink-0 text-2xl font-bold" style={{ color: 'var(--primary)' }}>
+                2.
               </div>
               <p>The room code can be found at the top of any active study room</p>
             </div>
             <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: 'var(--primary)' }}>
-                3
+              <div className="flex-shrink-0 text-2xl font-bold" style={{ color: 'var(--primary)' }}>
+                3.
               </div>
               <p>Copy and paste the code into the field above to join instantly</p>
             </div>

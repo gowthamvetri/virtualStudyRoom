@@ -54,11 +54,9 @@ export default function CreateRoom() {
       <div className="container mx-auto max-w-2xl animate-fadeIn">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--accent)' }}>
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--primary)' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
+            <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--primary)' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
           </div>
           <h1 className="text-4xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
             Create Study Room
